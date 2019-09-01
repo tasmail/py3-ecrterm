@@ -75,7 +75,7 @@ class SocketTransport(Transport):
             from ecrterm.ecr import ecr_log
             self.slog = ecr_log
 
-    def connect(self, timeout: int=None) -> bool:
+    def connect(self, timeout: int = None) -> bool:
         """
         Connect to the TCP socket. Return `True` on successful
         connection, `False` on an unsuccessful one.
@@ -101,7 +101,7 @@ class SocketTransport(Transport):
         except (ConnectionError, SocketTimeout) as exc:
             raise TransportConnectionFailed(exc.args[0])
 
-    def send(self, apdu, tries: int=0, no_wait: bool=False):
+    def send(self, apdu, tries: int = 0, no_wait: bool = False):
         """Send data."""
         to_send = bytes(apdu.to_list())
         self.slog(data=bs2hl(binstring=to_send), incoming=False)

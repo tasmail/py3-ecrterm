@@ -104,7 +104,7 @@ def toBytes(bytestring):
     """
     if type(bytestring) in set([bytes, bytearray]):
         return list(bytestring)
-    packedstring = ''.join(re.split('\W+', bytestring))
+    packedstring = ''.join(re.split(r'\W+', bytestring))
     if sys.version_info[0] > 2 and isinstance(packedstring, str):
         packedstring = packedstring.encode()
     try:

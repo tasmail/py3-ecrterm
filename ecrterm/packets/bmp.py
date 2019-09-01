@@ -62,7 +62,7 @@ class BMPFactory(Dumpling):
         bmp._key = bmp_key
         rest = bmp.parse(data)
         if len(rest) and (len(rest) == len(data)):
-            raise NotImplemented(
+            raise NotImplementedError(
                 "Bitmap Class without parsing mechanism detected")
         return bmp, rest
 
