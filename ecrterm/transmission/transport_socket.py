@@ -1,6 +1,6 @@
 import logging
-from functools import partial
 from binascii import hexlify
+from functools import partial
 from socket import (
     IPPROTO_TCP, SHUT_RDWR, SO_KEEPALIVE, SOL_SOCKET, create_connection)
 from socket import timeout as SocketTimeout
@@ -74,7 +74,7 @@ class SocketTransport(Transport):
         self._packetdebug = qs_parsed.get(
             'packetdebug', [self.defaults['packetdebug']])[0] == 'true'
 
-    def connect(self, timeout: int=None) -> bool:
+    def connect(self, timeout: int = None) -> bool:
         """
         Connect to the TCP socket. Return `True` on successful
         connection, `False` on an unsuccessful one.
@@ -100,7 +100,7 @@ class SocketTransport(Transport):
         except (ConnectionError, SocketTimeout) as exc:
             raise TransportConnectionFailed(exc.args[0])
 
-    def send(self, data: bytes, tries: int=0, no_wait: bool=False):
+    def send(self, data: bytes, tries: int = 0, no_wait: bool = False):
         """Send data."""
         logger.debug('>> %s', data.hex())
         total_sent = 0

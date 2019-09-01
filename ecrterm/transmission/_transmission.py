@@ -88,7 +88,7 @@ class Transmission(object):
                         packet, response)
                     logger.warning('Is Master Read Ahead happened.')
                     self.is_master = stay_master
-        except Exception as e:
+        except Exception:
             self.is_master = True
             raise
         self.is_master = True
