@@ -95,11 +95,13 @@ class Registration(CommandWithPassword):
     06 00
     Registration.
     arguments: password, cc, config_byte
-    bitmaps: service_byte
+    bitmaps: service_byte, tlv
     """
     CMD_CLASS = 0x06
     CMD_INSTR = 0x00
     wait_for_completion = True
+
+    ALLOWED_BITMAPS = ['tlv']
 
     config_byte = FlagByteField(data_type=ConfigByte)
     cc = BCDIntField(data_type=CurrencyCode, length=2, required=False)
@@ -367,6 +369,20 @@ class Authorisation(Packet):
         'card_number', 'track_2', 'track_3', 'timeout', 'max_status_infos',
         'pump_nr', 'cvv', 'additional', 'card_type', 'tlv']
 
+class PreAuthorisation(Packet):
+    """
+    06 22
+    If you want to authorize a transaction, this is the packet you need
+    to start with. Also for reading card data in general.
+    """
+    CMD_CLASS = 0x06
+    CMD_INSTR = 0x22
+    wait_for_completion = True
+
+    ALLOWED_BITMAPS = [
+        'amount', 'currency_code', 'status_byte', 'track_1', 'card_expire',
+        'card_number', 'track_2', 'track_3', 'timeout', 'max_status_infos',
+        'pump_nr', 'trace_number', 'additional', 'card_type', 'tlv']
 
 class PrintLine(Packet):
     """
