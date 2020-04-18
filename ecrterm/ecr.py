@@ -229,7 +229,10 @@ class ECR(object):
         for entry in self.transmitter.last_history:
             inc, packet = entry
             if inc and isinstance(packet, PrintLine):
-                printout += [packet.fixed_values['text']]
+                if packet.text is not None:
+                    printout += [packet.text]
+                else:
+                    printout += [""]
         return printout
 
     def payment(self, amount_cent=50, listener=None):
