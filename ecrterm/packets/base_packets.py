@@ -118,6 +118,7 @@ class EndOfDay(CommandWithPassword):
     CMD_INSTR = 0x50
     wait_for_completion = True
 
+
 class LogOff(Packet):
     """06 02 Log Off"""
     CMD_CLASS = 0x06
@@ -320,6 +321,14 @@ class StatusInformation(Packet):
         ret.update(float_version)
         return ret
 
+    def get_receipt_number(self):
+        bdict = self.as_dict()
+        if 'receipt' not in bdict.keys():
+            return {}
+        else:
+            ret = bdict['receipt']
+        return ret
+
 
 class IntermediateStatusInformation(Packet):
     """
@@ -369,6 +378,7 @@ class Authorisation(Packet):
         'card_number', 'track_2', 'track_3', 'timeout', 'max_status_infos',
         'pump_nr', 'cvv', 'additional', 'card_type', 'tlv']
 
+
 class PreAuthorisation(Packet):
     """
     06 22
@@ -383,6 +393,21 @@ class PreAuthorisation(Packet):
         'amount', 'currency_code', 'status_byte', 'track_1', 'card_expire',
         'card_number', 'track_2', 'track_3', 'timeout', 'max_status_infos',
         'pump_nr', 'trace_number', 'additional', 'card_type', 'tlv']
+
+
+class PartialCancellation(Packet):
+    """
+    06 23
+    This command executes a Partial-Cancellation for a Pre-Authorisation to release the unused amount of the reservation.
+    This command is also used for the Booking of a Reservation.
+    """
+    CMD_CLASS = 0x06
+    CMD_INSTR = 0x23
+    wait_for_completion = True
+
+    ALLOWED_BITMAPS = [
+        'receipt', 'amount', 'currency_code', 'trace_number', 'additional', 'aid', 'tlv']
+
 
 class PrintLine(Packet):
     """

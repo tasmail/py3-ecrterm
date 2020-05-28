@@ -16,7 +16,7 @@ from ecrterm.exceptions import (
 from ecrterm.packets.base_packets import (
     Authorisation, CloseCardSession, Completion, DisplayText, EndOfDay, Packet,
     PrintLine, ReadCard, Registration, ResetTerminal, StatusEnquiry,
-    StatusInformation, WriteFiles)
+    StatusInformation, WriteFiles, PreAuthorisation, PartialCancellation)
 from ecrterm.packets.types import ConfigByte
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
@@ -243,6 +243,63 @@ class ECR(object):
         throws exceptions.
         """
         packet = Authorisation(
+            amount=amount_cent,  # in cents.
+            currency_code=978,  # euro, only one that works, can be skipped.
+            tlv=[],
+        )
+        if listener:
+            packet.register_response_listener(listener)
+        code = self.transmit(packet=packet)
+
+        if code == 0:
+            # now check if the packet actually got what it wanted.
+            if self.transmitter.last.completion:
+                if isinstance(self.transmitter.last.completion, Completion):
+                    return True
+            else:
+                return False
+        else:
+            # @todo: remove this.
+            logger.error("transmit error?")
+        return False
+
+    def preauthorisation(self, amount_cent=50, listener=None):
+        """
+        executes a preauthorisation in amount of cents.
+        @returns: Receipt Number, if preAuthorisation was successful, or False if it was
+        canceled.
+        throws exceptions.
+        """
+        packet = PreAuthorisation(
+            amount=amount_cent,  # in cents.
+            currency_code=978,  # euro, only one that works, can be skipped.
+            tlv=[],
+        )
+        if listener:
+            packet.register_response_listener(listener)
+        code = self.transmit(packet=packet)
+
+        if code == 0:
+            # now check if the packet actually got what it wanted.
+            for entry in self.transmitter.last_history:
+                inc, paket = entry
+                if inc and isinstance(paket, StatusInformation):
+                    return paket.get_receipt_number()
+            return False
+        else:
+            # @todo: remove this.
+            logger.error("transmit error?")
+        return False
+
+    def partialcancellation(self, receipt=None, amount_cent=50, listener=None):
+        """
+        executes a preauthorisation in amount of cents.
+        @returns: Receipt Number, if preAuthorisation was successful, or False if it was
+        canceled.
+        throws exceptions.
+        """
+        packet = PartialCancellation(
+            receipt=receipt,
             amount=amount_cent,  # in cents.
             currency_code=978,  # euro, only one that works, can be skipped.
             tlv=[],
