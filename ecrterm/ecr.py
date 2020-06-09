@@ -16,7 +16,7 @@ from ecrterm.exceptions import (
 from ecrterm.packets.base_packets import (
     Authorisation, CloseCardSession, Completion, DisplayText, EndOfDay, Packet,
     PrintLine, ReadCard, Registration, ResetTerminal, StatusEnquiry,
-    StatusInformation, WriteFiles, PreAuthorisation, PartialCancellation)
+    StatusInformation, WriteFiles, PreAuthorisation, PartialCancellation, AbortCommand)
 from ecrterm.packets.types import ConfigByte
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
@@ -319,6 +319,12 @@ class ECR(object):
             # @todo: remove this.
             logger.error("transmit error?")
         return False
+
+    def abort(self):
+        """
+        sends abort command
+        """
+        return self.transmit(AbortCommand())
 
     def restart(self):
         """Restarts/resets the PT."""
