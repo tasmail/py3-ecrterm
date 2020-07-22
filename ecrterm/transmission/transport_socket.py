@@ -3,7 +3,6 @@ from binascii import hexlify
 from functools import partial
 from socket import (
     IPPROTO_TCP, SHUT_RDWR, SO_KEEPALIVE, SOL_SOCKET, create_connection)
-import ssl
 from socket import timeout as SocketTimeout
 from struct import unpack
 from sys import platform
@@ -49,7 +48,7 @@ class SocketTransport(Transport):
     insert_delays = False
     defaults = dict(
         connect_timeout=5, so_keepalive=0, tcp_keepidle=1, tcp_keepintvl=3,
-        tcp_keepcnt=5, ssl=False, debug='false', packetdebug='false')
+        tcp_keepcnt=5, debug='false', packetdebug='false')
 
     def __init__(self, uri: str):
         """Setup the IP and Port."""
@@ -70,8 +69,6 @@ class SocketTransport(Transport):
             'tcp_keepintvl', [self.defaults['tcp_keepintvl']])[0])
         self.tcp_keepcnt = int(qs_parsed.get(
             'tcp_keepcnt', [self.defaults['tcp_keepcnt']])[0])
-        self.ssl = qs_parsed.get(
-            'ssl', [self.defaults['ssl']])[0] == 'true'
         self._debug = qs_parsed.get(
             'debug', [self.defaults['debug']])[0] == 'true'
         self._packetdebug = qs_parsed.get(
@@ -82,16 +79,11 @@ class SocketTransport(Transport):
         Connect to the TCP socket. Return `True` on successful
         connection, `False` on an unsuccessful one.
         """
-        context = ssl._create_unverified_context()
-
         if timeout is None:
             timeout = self.connect_timeout
-        socket = create_connection(address=(self.ip, self.port), timeout=timeout)
         try:
-            socket = create_connection(address=(self.ip, self.port), timeout=timeout)
-            self.sock = socket
-            if self.ssl:
-                self.sock = context.wrap_socket(socket, server_hostname=self.ip)
+            self.sock = create_connection(
+                address=(self.ip, self.port), timeout=timeout)
             if self.so_keepalive:
                 self.sock.setsockopt(
                     SOL_SOCKET, SO_KEEPALIVE, self.so_keepalive)
