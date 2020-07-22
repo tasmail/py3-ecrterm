@@ -16,7 +16,7 @@ from ecrterm.exceptions import (
 from ecrterm.packets.base_packets import (
     Authorisation, CloseCardSession, Completion, DisplayText, EndOfDay, Packet,
     PrintLine, ReadCard, Registration, ResetTerminal, StatusEnquiry,
-    StatusInformation, WriteFiles, PreAuthorisation, PartialCancellation, AbortCommand)
+    StatusInformation, WriteFiles)
 from ecrterm.packets.types import ConfigByte
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
@@ -110,14 +110,6 @@ class ECR(object):
 
         Pass `socket://` prefixed IP address and port for TCP/IP
         transport: `socket://192.168.1.163:20007`
-        You can set various timeouts by passing
-        it in the uri. An example:
-        `socket://192.168.1.163:20007?connect_timeout=5&so_keepalive=5&tcp_keepidle=1&tcp_keepintvl=3&tcp_keepcnt=5`
-
-        See http://man7.org/linux/man-pages/man7/tcp.7.html for TCP
-        flags details.
-
-        Use Flag `ssl=true` to use connection over a secured connection. SSl/TLS
         """
         if device.startswith('/') or device.startswith('COM'):
             self.transport = SerialTransport(device)
@@ -229,10 +221,7 @@ class ECR(object):
         for entry in self.transmitter.last_history:
             inc, packet = entry
             if inc and isinstance(packet, PrintLine):
-                if packet.text is not None:
-                    printout += [packet.text]
-                else:
-                    printout += [""]
+                printout += [packet.fixed_values['text']]
         return printout
 
     def payment(self, amount_cent=50, listener=None):
@@ -262,69 +251,6 @@ class ECR(object):
             # @todo: remove this.
             logger.error("transmit error?")
         return False
-
-    def preauthorisation(self, amount_cent=50, listener=None):
-        """
-        executes a preauthorisation in amount of cents.
-        @returns: Receipt Number, if preAuthorisation was successful, or False if it was
-        canceled.
-        throws exceptions.
-        """
-        packet = PreAuthorisation(
-            amount=amount_cent,  # in cents.
-            currency_code=978,  # euro, only one that works, can be skipped.
-            tlv=[],
-        )
-        if listener:
-            packet.register_response_listener(listener)
-        code = self.transmit(packet=packet)
-
-        if code == 0:
-            # now check if the packet actually got what it wanted.
-            for entry in self.transmitter.last_history:
-                inc, paket = entry
-                if inc and isinstance(paket, StatusInformation):
-                    return paket.get_receipt_number()
-            return False
-        else:
-            # @todo: remove this.
-            logger.error("transmit error?")
-        return False
-
-    def partialcancellation(self, receipt=None, amount_cent=50, listener=None):
-        """
-        executes a preauthorisation in amount of cents.
-        @returns: Receipt Number, if preAuthorisation was successful, or False if it was
-        canceled.
-        throws exceptions.
-        """
-        packet = PartialCancellation(
-            receipt=receipt,
-            amount=amount_cent,  # in cents.
-            currency_code=978,  # euro, only one that works, can be skipped.
-            tlv=[],
-        )
-        if listener:
-            packet.register_response_listener(listener)
-        code = self.transmit(packet=packet)
-
-        if code == 0:
-            # now check if the packet actually got what it wanted.
-            if self.transmitter.last.completion:
-                if isinstance(self.transmitter.last.completion, Completion):
-                    return True
-            else:
-                return False
-        else:
-            # @todo: remove this.
-            logger.error("transmit error?")
-        return False
-
-    def abort(self):
-        """
-        sends abort command
-        """
-        return self.transmit(AbortCommand())
 
     def restart(self):
         """Restarts/resets the PT."""
