@@ -110,6 +110,14 @@ class ECR(object):
 
         Pass `socket://` prefixed IP address and port for TCP/IP
         transport: `socket://192.168.1.163:20007`
+        You can set various timeouts by passing
+        it in the uri. An example:
+        `socket://192.168.1.163:20007?connect_timeout=5&so_keepalive=5&tcp_keepidle=1&tcp_keepintvl=3&tcp_keepcnt=5`
+
+        See http://man7.org/linux/man-pages/man7/tcp.7.html for TCP
+        flags details.
+
+        Use Flag `ssl=true` to use connection over a secured connection. SSl/TLS
         """
         if device.startswith('/') or device.startswith('COM'):
             self.transport = SerialTransport(device)
