@@ -549,3 +549,25 @@ class WriteFiles(WriteFileBase):
     @classmethod
     def can_parse(cls, data: Union[bytes, List[int]]) -> bool:
         return False
+
+
+class ReservationRequest(Authorisation):
+    """
+    06 22
+    If you want to request a reservation, this is the packet you need to start with.
+    """
+    CMD_INSTR = 0x22
+
+
+class ReservationBooking(Packet):
+    """
+    06 24
+    If you want to book a reservation, this is the packet you need to start with.
+    """
+    CMD_CLASS = 0x06
+    CMD_INSTR = 0x24
+    wait_for_completion = True
+
+    ALLOWED_BITMAPS = [
+        'receipt', 'amount', 'currency_code', 'status_byte', 'additional',
+        'trace_number', 'card_type', 'aid', 'tlv']

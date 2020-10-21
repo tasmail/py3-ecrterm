@@ -327,6 +327,61 @@ class ECR(object):
         transmission = self.transmitter.transmit(packet)
         return transmission
 
+    def request_reservation(self, amount_cent=50, listener=None):
+        """
+        executes a reservation request in amount of cents.
+        @returns: True, if reservation went through, or False if it was canceled.
+        throws exceptions.
+        """
+        packet = ReservationRequest(
+            amount=amount_cent,  # in cents.
+            currency_code=978,  # euro, only one that works, can be skipped.
+            tlv=[],
+        )
+        if listener:
+            packet.register_response_listener(listener)
+        code = self.transmit(packet=packet)
+
+        if code == 0:
+            # now check if the packet actually got what it wanted.
+            if self.transmitter.last.completion:
+                if isinstance(self.transmitter.last.completion, Completion):
+                    return True
+            else:
+                return False
+        else:
+            # @todo: remove this.
+            logger.error("transmit error?")
+        return False
+
+    def book_reservation(self, receipt_no, amount_cent=50, listener=None):
+        """
+        executes a reservation booking for receipt with cancel amount in cents.
+        @returns: True, if booking went through, or False if it was canceled.
+        throws exceptions.
+        """
+        packet = ReservationBooking(
+            receipt=receipt_no,
+            amount=amount_cent,
+            currency_code=978,
+            tlv=[],
+        )
+        if listener:
+            packet.register_response_listener(listener)
+        code = self.transmit(packet=packet)
+
+        if code == 0:
+            # now check if the packet actually got what it wanted.
+            if self.transmitter.last.completion:
+                if isinstance(self.transmitter.last.completion, Completion):
+                    return True
+            else:
+                return False
+        else:
+            # @todo: remove this.
+            logger.error("transmit error?")
+        return False
+
     # dev functions.
     #########################################################################
 
