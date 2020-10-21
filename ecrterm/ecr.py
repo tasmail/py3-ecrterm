@@ -15,8 +15,8 @@ from ecrterm.exceptions import (
     TransportConnectionFailed, TransportLayerException)
 from ecrterm.packets.base_packets import (
     Authorisation, CloseCardSession, Completion, DisplayText, EndOfDay, Packet,
-    PrintLine, ReadCard, Registration, ResetTerminal, StatusEnquiry,
-    StatusInformation, WriteFiles)
+    PrintLine, ReadCard, Registration, ReservationBooking, ReservationRequest,
+    ResetTerminal, StatusEnquiry, StatusInformation, WriteFiles)
 from ecrterm.packets.types import ConfigByte
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
