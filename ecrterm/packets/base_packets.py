@@ -377,6 +377,21 @@ class Authorisation(Packet):
         'pump_nr', 'cvv', 'additional', 'card_type', 'tlv']
 
 
+class Reversal(CommandWithPassword):
+    """
+    06 30
+    Reverse a payment
+    """
+    CMD_CLASS = 0x06
+    CMD_INSTR = 0x30
+    wait_for_completion = True
+
+    ALLOWED_BITMAPS = [
+        'receipt', 'amount', 'currency_code', 'status_byte', 'track_1',
+        'card_expire', 'card_number', 'track_2', 'track_3', 'additional',
+        'tlv']
+
+
 class PreAuthorisation(Packet):
     """
     06 22
