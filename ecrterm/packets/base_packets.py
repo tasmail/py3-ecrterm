@@ -387,8 +387,9 @@ class Reversal(CommandWithPassword):
     wait_for_completion = True
 
     ALLOWED_BITMAPS = [
-        'receipt', 'amount', 'currency_code', 'status_byte', 'track_1', 'card_expire',
-        'card_number', 'track_2', 'track_3', 'additional', 'tlv']
+        'receipt', 'amount', 'currency_code', 'status_byte', 'track_1',
+        'card_expire', 'card_number', 'track_2', 'track_3', 'additional',
+        'tlv']
 
 
 class PreAuthorisation(Packet):

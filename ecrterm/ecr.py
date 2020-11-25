@@ -307,7 +307,6 @@ class ECR(object):
             logger.error("transmit error?")
         return False
 
-
     def partialcancellation(self, receipt=None, amount_cent=50, listener=None):
         """
         executes a preauthorisation in amount of cents.
@@ -359,7 +358,6 @@ class ECR(object):
         """Log off the PT."""
         self._state_registered = False
         return self.transmit(LogOff())
-    
 
     def show_text(self, lines=None, duration=5, beeps=0):
         """
