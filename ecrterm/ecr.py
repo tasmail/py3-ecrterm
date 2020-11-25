@@ -16,7 +16,7 @@ from ecrterm.exceptions import (
 from ecrterm.packets.base_packets import (
     Authorisation, CloseCardSession, Completion, DisplayText, EndOfDay, Packet,
     PrintLine, ReadCard, Registration, ResetTerminal, StatusEnquiry,
-    StatusInformation, WriteFiles, PreAuthorisation, PartialCancellation)
+    StatusInformation, WriteFiles, PreAuthorisation, PartialCancellation, LogOff, Reversal)
 from ecrterm.packets.types import ConfigByte
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
@@ -280,6 +280,34 @@ class ECR(object):
             logger.error("transmit error?")
         return False
 
+    def reversal(self, receipt, listener=None):
+        """
+        reverts a transaction
+        @param receipt is the receipt number of the initial transaction
+        @returns True if Transaction was Reverted
+        throws exceptions
+        """
+        packet = Reversal(
+            password=self.password,
+            receipt=receipt,
+        )
+        if listener:
+            packet.register_response_listener(listener)
+        code = self.transmit(packet=packet)
+
+        if code == 0:
+            # now check if the packet actually got what it wanted.
+            if self.transmitter.last.completion:
+                if isinstance(self.transmitter.last.completion, Completion):
+                    return True
+            else:
+                return False
+        else:
+            # @todo: remove this.
+            logger.error("transmit error?")
+        return False
+
+
     def partialcancellation(self, receipt=None, amount_cent=50, listener=None):
         """
         executes a preauthorisation in amount of cents.
@@ -326,6 +354,12 @@ class ECR(object):
         if self.transport.insert_delays:
             sleep(1)
         return ret
+    
+    def logoff(self):
+        """Log off the PT."""
+        self._state_registered = False
+        return self.transmit(LogOff())
+    
 
     def show_text(self, lines=None, duration=5, beeps=0):
         """
