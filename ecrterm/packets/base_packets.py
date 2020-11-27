@@ -244,15 +244,11 @@ class StatusInformation(Packet):
         # bitmap 0x60 (totals) contains the required information.
         # another bitmap (amount) holds the amount
 
-        ## FIXME Parsing of totals in the parser
-        return ret
-
         if 'totals' not in bdict.keys():
             # this packet holds no detail information but an amount.
             return ret
-        totals = bdict['totals']
-        totals_list = totals.value()
-        # totals_list = str(bdict['totals'])
+        totals_list = bdict['totals']
+
         # now we build our real data our of it.
 
         # rebuild date and time.
@@ -260,42 +256,39 @@ class StatusInformation(Packet):
         my_date = None
         if 'time' in bdict.keys():
             # print bdict['time'].value()
-            mt = str(bdict['time'].value())
+            mt = str(bdict['time'])
             my_time = datetime.time(
                 hour=int(mt[0:2]), minute=int(mt[2:4]), second=int(mt[4:6]))
         if 'date_day' in bdict.keys():
             # print bdict['date'].value()
-            md = str(bdict['date_day'].value())
+            md = str(bdict['date_day'])
             my_date = datetime.date(
                 year=datetime.datetime.now().year, month=int(md[0:2]),
                 day=int(md[2:4]))
         ret = {
-            'receipt-number-start':
-                BCD.as_int(BCD.decode_bcd(totals_list[0:2])),
-            'receipt-number-end':
-                BCD.as_int(BCD.decode_bcd(totals_list[2:4])),
-            'number-ec-card': bs2hl(totals_list[4])[0],
-            'turnover-ec-card':
-                BCD.as_int(BCD.decode_bcd(totals_list[5:5 + 6])),
-            'number-jcb': bs2hl(totals_list[11])[0],
-            'turnover-jcb': BCD.as_int(BCD.decode_bcd(totals_list[12:12 + 6])),
-            'number-eurocard': bs2hl(totals_list[18])[0],
+            'receipt-number-start': BCDIntField(length=2).from_bytes(totals_list[0:2]),
+            'receipt-number-end': BCDIntField(length=2).from_bytes(totals_list[2:4]),
+            'number-ec-card': totals_list[4],
+            'turnover-ec-card': BCDIntField(length=3).from_bytes(totals_list[5:5 + 6]),
+            'number-jcb': totals_list[11],
+            'turnover-jcb': BCDIntField(length=3).from_bytes(totals_list[12:12 + 6]),
+            'number-eurocard': totals_list[18],
             'turnover-eurocard':
-                BCD.as_int(BCD.decode_bcd(totals_list[19:19 + 6])),
-            'number-amex': bs2hl(totals_list[25])[0],
+                BCDIntField(length=3).from_bytes(totals_list[19:19 + 6]),
+            'number-amex': totals_list[25],
             'turnover-amex':
-                BCD.as_int(BCD.decode_bcd(totals_list[26:26 + 6])),
-            'number-visa': bs2hl(totals_list[32])[0],
+                BCDIntField(length=3).from_bytes(totals_list[26:26 + 6]),
+            'number-visa': totals_list[32],
             'turnover-visa':
-                BCD.as_int(BCD.decode_bcd(totals_list[33:33 + 6])),
-            'number-diners': bs2hl(totals_list[39])[0],
+                BCDIntField(length=3).from_bytes(totals_list[33:33 + 6]),
+            'number-diners': totals_list[39],
             'turnover-diners':
-                BCD.as_int(BCD.decode_bcd(totals_list[40:40 + 6])),
-            'number-remaining': bs2hl(totals_list[46])[0],
+                BCDIntField(length=3).from_bytes(totals_list[40:40 + 6]),
+            'number-remaining': totals_list[46],
             'turnover-remaining':
-                BCD.as_int(BCD.decode_bcd(totals_list[47:47 + 6])),
-            'amount': int(bdict['amount'].value()),
-            'turnover-amount': int(bdict['amount'].value()),
+                BCDIntField(length=3).from_bytes(totals_list[47:47 + 6]),
+            'amount': bdict['amount'],
+            'turnover-amount': bdict['amount'],
             'date': my_date,
             'time': my_time,
             'number-total': 0,
