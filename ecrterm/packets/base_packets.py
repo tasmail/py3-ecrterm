@@ -612,13 +612,13 @@ class PrintTextBlock(Packet):
         """We just print the data for now."""
         # print (type(data))  ist eine liste
         #print(data)
-        print('---------------------------')
+        print('--------PrintTextBlock-------------------')
         beleg = ''
         #for b in data:
         for n in range(12, len(data)-3):
             beleg= beleg+( chr(data[n]))
         print(beleg)
-        print('---------------------------')
+        print('--------PrintTextBlock-----EOF-----------')
         return data
 
 
