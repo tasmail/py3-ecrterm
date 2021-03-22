@@ -600,6 +600,7 @@ Packets.register(PrintLine)
 
 
 class PrintTextBlock(Packet):
+    #global g_beleg
     """
     06 D3
     Same as Printline but for a textblock.
@@ -609,6 +610,7 @@ class PrintTextBlock(Packet):
     cmd_instr = 0xd3
 
     def consume_fixed(self, data, length):
+        #global g_beleg
         """We just print the data for now."""
         # print (type(data))  ist eine liste
         #print(data)
@@ -618,6 +620,7 @@ class PrintTextBlock(Packet):
         for n in range(12, len(data)-3):
             beleg= beleg+( chr(data[n]))
         print(beleg)
+        #g_beleg = beleg
         print('--------PrintTextBlock-----EOF-----------')
         return data
 
