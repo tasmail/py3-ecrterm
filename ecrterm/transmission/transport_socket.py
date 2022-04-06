@@ -4,8 +4,12 @@ from socket import (
 from socket import timeout as SocketTimeout
 from struct import unpack
 from sys import platform
-from typing import Tuple
-from urllib.parse import parse_qs, urlsplit
+
+try:
+    from urllib.parse import parse_qs, urlsplit
+except:
+    from urlparse import urlparse, parse_qs
+    urlsplit = urlparse
 
 from ecrterm.common import Transport, noop
 from ecrterm.conv import bs2hl
@@ -25,7 +29,7 @@ except ImportError:
     TCP_KEEPCNT = None
 
 
-def hexformat(data: bytes) -> str:
+def hexformat(data): # -> str:
     """Return a prettified binary data."""
     hexlified = str(hexlify(data), 'ascii')
     splitted = ':'.join(
@@ -48,7 +52,7 @@ class SocketTransport(Transport):
         connect_timeout=5, so_keepalive=0, tcp_keepidle=1, tcp_keepintvl=3,
         tcp_keepcnt=5, debug='false', packetdebug='false')
 
-    def __init__(self, uri: str):
+    def __init__(self, uri):
         """Setup the IP and Port."""
         parsed = urlsplit(url=uri)
         if ':' not in parsed.netloc:
@@ -75,7 +79,7 @@ class SocketTransport(Transport):
             from ecrterm.ecr import ecr_log
             self.slog = ecr_log
 
-    def connect(self, timeout: int = None) -> bool:
+    def connect(self, timeout = None): # -> bool:
         """
         Connect to the TCP socket. Return `True` on successful
         connection, `False` on an unsuccessful one.
@@ -98,10 +102,10 @@ class SocketTransport(Transport):
                 self.sock.setsockopt(
                     IPPROTO_TCP, TCP_KEEPCNT, self.tcp_keepcnt)
             return True
-        except (ConnectionError, SocketTimeout) as exc:
+        except (Exception, SocketTimeout) as exc:
             raise TransportConnectionFailed(exc.args[0])
 
-    def send(self, apdu, tries: int = 0, no_wait: bool = False):
+    def send(self, apdu, tries = 0, no_wait = False):
         """Send data."""
         to_send = bytes(apdu.to_list())
         self.slog(data=bs2hl(binstring=to_send), incoming=False)
@@ -119,7 +123,7 @@ class SocketTransport(Transport):
             return True
         return self.receive()
 
-    def _receive_bytes(self, length: int) -> bytes:
+    def _receive_bytes(self, length): # -> bytes:
         """Receive and return a fixed amount of bytes."""
         recv_bytes = 0
         result = b''
@@ -138,7 +142,7 @@ class SocketTransport(Transport):
             recv_bytes += len(chunk)
         return result
 
-    def _receive_length(self) -> Tuple[bytes, int]:
+    def _receive_length(self): # -> Tuple[bytes, int]:
         """
         Receive the 4 bytes on the socket which indicates the message
         length, and return the packed and the `int` converted length.
@@ -152,7 +156,7 @@ class SocketTransport(Transport):
         data += length
         return data, unpack('<H', length)[0]
 
-    def _receive(self, timeout=TIMEOUT_T2) -> bytes:
+    def _receive(self, timeout=TIMEOUT_T2): # -> bytes:
         """
         Receive the response from the terminal and return is as `bytes`.
         """
@@ -163,7 +167,7 @@ class SocketTransport(Transport):
         return data + new_data
 
     def receive(
-            self, timeout=None, *args, **kwargs) -> Tuple[bool, APDUPacket]:
+            self, timeout=None, *args, **kwargs): # -> Tuple[bool, APDUPacket]:
         """
         Receive data, return success status and ADPUPacket instance.
         """

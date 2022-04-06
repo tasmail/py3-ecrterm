@@ -54,7 +54,7 @@ class Packet(APDUPacket):
     def register_response_listener(self, listener):
         self.response_listener = listener
 
-    def handle_response(self, response, tm) -> bool:
+    def handle_response(self, response, tm): # -> bool:
         """
         Handle a response for a certain packet type, return `True` if
         the ECR should become master, `False` otherwise.

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Common Base classes, Definitions and Ancestors.
 """
