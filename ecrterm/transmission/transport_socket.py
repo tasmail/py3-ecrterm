@@ -150,11 +150,11 @@ class SocketTransport(Transport):
         data = self._receive_bytes(length=3)
         length = data[2]
         if length != 0xff:
-            return data, length
+            return data, int(length)
         # Need to get 2 more bytes
         length = self._receive_bytes(length=2)
         data += length
-        return data, unpack('<H', length)[0]
+        return data, int(unpack('<H', length)[0])
 
     def _receive(self, timeout=TIMEOUT_T2): # -> bytes:
         """
