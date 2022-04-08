@@ -52,14 +52,18 @@ class _PacketRegister:
             self.packets[key_str] = packet_class
 
     def detect(self, datastream):
-        # detects which class to use.
-        if is_stringlike(datastream):
-            # lets convert our string into a bytelist.
-            datastream = toBytes(datastream[:2])
-        # read the first two bytes of the stream.
-        cc, ci = datastream[:2]
-        # print '<| %s %s' % (hex(cc), hex(ci))
-        # now look up if we got this packet class:
+        def _convert(dt):
+            for x in dt:
+                if isinstance(x, int):
+                    yield x
+                    continue
+
+                if isinstance(x, str):
+                    yield ord(x)
+                    continue
+
+        datastream2 = list(_convert(datastream))
+        cc, ci = datastream2[:2]
         return self.packets.get(
             '%s_%s' % (hex(cc), hex(ci)),
             self.packets.get('%s' % (hex(cc)), None))
@@ -180,6 +184,9 @@ class APDUPacket(object):
 
     def to_list(self):
         return [self.cmd_class, self.cmd_instr or 0] + self.data
+
+    def to_bytes(self):
+        return ''.join(list(map(chr, self.to_list())))
 
     #############################################
     # Parsing ###################################

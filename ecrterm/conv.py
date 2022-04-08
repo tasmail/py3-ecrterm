@@ -96,16 +96,8 @@ def toASCIIString(bytelist):
     return ''.join(map(chr, bytelist))
 
 
-def toBytes(bytestring):
-    """
-    Returns a list of bytes from a byte string
-
-    bytestring: a byte string of the format "3B 65 00 00 9C 11 01 01 03" or
-    "3B6500009C11010103" or "3B6500   009C1101  0103"
-    """
-    if type(bytestring) in set([bytes, bytearray]):
-        return list(bytestring)
-    packedstring = ''.join(re.split(r'\W+', bytestring))
+def ascii_bytes_to_bytes(ascii_bytes):
+    packedstring = ''.join(re.split(r'\W+', ascii_bytes))
     if sys.version_info[0] > 2 and isinstance(packedstring, str):
         packedstring = packedstring.encode()
     try:
@@ -113,6 +105,26 @@ def toBytes(bytestring):
             '2s' * (len(packedstring) // 2), packedstring), [])
     except Exception:
         raise TypeError('not a string representing a list of bytes')
+
+
+def is_ascii_alnum(s):
+    try:
+        return unicode.isalnum(s.decode('ascii'))
+    except UnicodeDecodeError:
+        return False
+
+
+def toBytes(bytestring):
+    """
+    Returns a list of bytes from a byte string
+
+    bytestring: a byte string of the format "3B 65 00 00 9C 11 01 01 03" or
+    "3B6500009C11010103" or "3B6500   009C1101  0103"
+    """
+    if is_ascii_alnum(bytestring):
+        return ascii_bytes_to_bytes(bytestring)
+    else:
+        return list(map(ord, bytestring))
 
 
 """GSM3.38 character conversion table."""

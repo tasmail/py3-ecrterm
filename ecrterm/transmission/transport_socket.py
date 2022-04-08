@@ -107,7 +107,7 @@ class SocketTransport(Transport):
 
     def send(self, apdu, tries = 0, no_wait = False):
         """Send data."""
-        to_send = bytes(apdu.to_list())
+        to_send = apdu.to_bytes()
         self.slog(data=bs2hl(binstring=to_send), incoming=False)
         total_sent = 0
         msglen = len(to_send)
@@ -148,7 +148,7 @@ class SocketTransport(Transport):
         length, and return the packed and the `int` converted length.
         """
         data = self._receive_bytes(length=3)
-        length = data[2]
+        length = ord(data[2])
         if length != 0xff:
             return data, length
         # Need to get 2 more bytes
