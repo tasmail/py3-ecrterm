@@ -429,6 +429,9 @@ class ECR(object):
     def parse_str(self, s):
         return parse_represented_data(s)
 
+    def close(self):
+        self.transport.close()
+
 
 if __name__ == '__main__':
     _logfile = open('./terminallog.txt', 'aw')

@@ -13,7 +13,7 @@ def printer(lines_of_text):
 
 
 if __name__ == '__main__':
-    e = ECR(device='socket://192.168.1.163:20007', password='111111')
+    e = ECR(device='socket://192.168.1.113:5577', password='111111')
     # reenable logging:
     e.transport.slog = ecr_log
     print(e.detect_pt())
