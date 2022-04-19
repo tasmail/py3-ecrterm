@@ -20,9 +20,8 @@ if __name__ == '__main__':
     if e.detect_pt():
         e.register(config_byte=Registration.generate_config(
             ecr_prints_receipt=False,
-            ecr_prints_admin_receipt=False,
-            ecr_controls_admin=True,
-            ecr_controls_payment=True))
+            ecr_prints_admin_receipt=False),
+            tlv=0xD1)
 
         e.wait_for_status()
         status = e.status()
@@ -49,5 +48,5 @@ if __name__ == '__main__':
         else:
             e.wait_for_status()
             e.show_text(
-                lines=['Auf Wiedersehen!', ' ', 'Vorgang abgebrochen'],
-                beeps=2)
+               lines=['Auf Wiedersehen!', ' ', 'Vorgang abgebrochen'],
+               beeps=2)

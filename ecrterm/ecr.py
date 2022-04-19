@@ -334,6 +334,29 @@ class ECR(object):
             i += 1
         return self.transmit(DisplayText(**kw))
 
+    def print_text(self, lines):
+        """Print text to the printer.
+        lines is an array of line tuples with attributes, e.g.:
+        [
+            ('Hello', 0x10),
+            ('World!', 0x00)
+        ]
+        0x10: Double height
+        0x20: Double width
+        0x30: double width + double height
+        0x40:centred
+        0x50: centred + double height
+        0x60: centred + double width
+        0x70: centred + double width + double height
+        0x0F: justified right (but in this case, all others attributes are disabled)
+        0xFF: linefeed
+        """
+        for line, attribute in lines:
+            res = self.transmit(PrintLine(text=line, attribute=attribute))
+            if TRANSMIT_OK != res:
+                return res
+        return TRANSMIT_OK
+
     def status(self):
         """
         executes a status enquiry. also sets self.version if not set.
