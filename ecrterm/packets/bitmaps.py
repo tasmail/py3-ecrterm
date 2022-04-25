@@ -19,6 +19,8 @@ BITMAPS = {
     0x04: (BMP.FormatBCDByte(6), 'amount', 'Amount'),
     0x05: (BMP.FormatByte(1), 'pump_nr', 'binary pump-Nr.'),
     0x06: (BMP.FormatTLV(), 'tlv', 'TLV'),
+    0x07: (BMP.FormatLLVAR(), 'text_lines', 'Text Lines'),
+    0x09: (BMP.FormatByte(1), 'attribute', 'Print Line Attribute'),
     0x0B: (BMP.FormatBCDByte(3), 'trace_number', 'trace-number'),
     0x0C: (BMP.FormatBCDByte(3), 'time', 'Time'),
     0x0D: (BMP.FormatBCDByte(2), 'date_day', 'date, MM DD (see AA)'),
@@ -38,6 +40,8 @@ BITMAPS = {
     0x24: (
         BMP.FormatLLLVAR(), 'track_3',
         'track 3 data, \'E\' used to indicate masked numeric digit1'),
+    0x25: (BMP.FormatTLV(), 'print_texts',
+           'container with an arbitrary list of attributes and text lines (tag 09 and 07)'),
     0x27: (BMP.FormatByte(1), 'result_code', 'binary result-code'),
     0x29: (BMP.FormatBCDByte(4), 'tid', 'TID'),
     0x2A: (BMP.FormatByte(15), 'vu', 'ASCII VU-number'),

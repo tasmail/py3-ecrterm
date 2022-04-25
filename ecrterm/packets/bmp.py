@@ -82,7 +82,7 @@ class BMP(BMPFactory):
             initializes a BMP and makes sure _data contains a list.
         """
         if not self._data:
-            if not data:
+            if data is None:
                 self._data = []
             elif isinstance(data, list):
                 self._data = data
@@ -158,7 +158,7 @@ class LVAR(BMP):
             self._data = conv.bs2hl(data)
             self._rangecheck()
         else:
-            super(LVAR, self).__init__(self._data)
+            super(LVAR, self).__init__(data)
 
     def _rangecheck(self):
         """
