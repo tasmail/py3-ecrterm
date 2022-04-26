@@ -611,7 +611,7 @@ class PrintTextBlock(Packet):
     fixed_arguments = ["lines"]
 
     def enrich_fixed(self):
-        bs = [0x06, 0x39, None] # tlv
+        bs = [0x06, None, 0x25, None] # tlv
         total_len = 0
         for line, attr in self.fixed_values.get("lines", []):
             line_cmd = [0x07]
@@ -623,7 +623,8 @@ class PrintTextBlock(Packet):
 
         bs += [0x09, 0x01, 0xFF]
         total_len += 3
-        bs[2] = total_len
+        bs[1] = total_len + 1 # tlv len
+        bs[3] = total_len # print-texts len
         return bs
 
     def consume_fixed(self, data, length):
