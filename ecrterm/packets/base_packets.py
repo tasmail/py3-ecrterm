@@ -608,6 +608,23 @@ class PrintTextBlock(Packet):
     """
     cmd_class = 0x6
     cmd_instr = 0xd3
+    fixed_arguments = ["lines"]
+
+    def enrich_fixed(self):
+        bs = [0x06, 0x39, None] # tlv
+        total_len = 0
+        for line, attr in self.fixed_values.get("lines", []):
+            line_cmd = [0x07]
+            l = bs2hl(line)
+            line_cmd += [len(l)]
+            line_cmd += l
+            bs += line_cmd
+            total_len += len(line_cmd)
+
+        bs += [0x09, 0x01, 0xFF]
+        total_len += 3
+        bs[2] = total_len
+        return bs
 
     def consume_fixed(self, data, length):
         #global g_beleg
@@ -626,6 +643,7 @@ class PrintTextBlock(Packet):
 
 
 Packets.register(PrintTextBlock)
+
 
 
 class Diagnosis(Packet):
