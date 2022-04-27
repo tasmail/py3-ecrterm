@@ -1,12 +1,9 @@
 import datetime
-import struct
-from math import ceil
 
 from ecrterm.common import ERRORCODES, INTERMEDIATE_STATUS_CODES
 from ecrterm.conv import bs2hl, toHexString
 from ecrterm.packets.apdu import APDUPacket, Packets
 from ecrterm.packets.bmp import BCD, LLLVAR
-from ecrterm.packets.tlv import TLV
 
 
 class Packet(APDUPacket):

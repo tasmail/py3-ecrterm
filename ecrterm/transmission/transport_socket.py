@@ -166,7 +166,6 @@ class SocketTransport(Transport):
         new_data = self._receive_bytes(length=length)
         return data + new_data
 
-    #@measure
     def receive(
             self, timeout=None, *args, **kwargs): # -> Tuple[bool, APDUPacket]:
         """
