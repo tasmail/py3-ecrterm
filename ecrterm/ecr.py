@@ -357,21 +357,30 @@ class ECR(object):
                 return res
         return TRANSMIT_OK
 
-
     def print_text_block(self, lines):
-        lines_packet = []
+        lines_count = 10
+        chunks = [lines[x:x+lines_count] for x in xrange(0, len(lines), lines_count)]
 
-        for line, attribute in lines:
-            lines_packet.extend(Packet(text_lines=bs2hl(line)).get_data()[1:])
-            lines_packet.extend(Packet(attribute=attribute).get_data()[1:])
+        for chunk in chunks:
+            lines_packet = []
 
-        lines_packet.extend(Packet(attribute=0xff).get_data()[1:])
+            for line, attribute in chunk:
+                lines_packet.extend(Packet(text_lines=bs2hl(line[:24])).get_data_raw())
+                lines_packet.extend(Packet(attribute=attribute).get_data_raw())
 
-        texts_packet = Packet(print_texts=lines_packet).get_data()[1:]
+            if chunks[len(chunks) - 1] == chunk:
+                lines_packet.extend(Packet(attribute=0xff).get_data_raw())
 
-        return self.transmit(
-            PrintTextBlock(tlv=texts_packet)
-        )
+            texts_packet = Packet(print_texts=lines_packet).get_data_raw()
+
+            res = self.transmit(
+                PrintTextBlock(tlv=texts_packet)
+            )
+
+            if res != TRANSMIT_OK:
+                return res
+
+        return TRANSMIT_OK
 
     def status(self):
         """

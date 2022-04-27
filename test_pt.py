@@ -41,11 +41,27 @@ if __name__ == '__main__':
                 # status == 0xDC for ReadCard (06 C0) -> Karte drin.
                 # 0x9c karte draussen.
 
-        # e.print_text(lines=[('Line 1', 0x00), ('Line 2', 0x00), ('      ', 0x00), ('       ', 0x00), ('      ', 0x00),
-        # ('       ', 0x00), ('      ', 0x00), ('       ', 0x00), ('      ', 0x00), ('       ', 0x00), ('      ', 0x00),
-        # ('       ', 0x00)])
+        test_lines = [
+            ('       Euro Palace    ', 0),
+            ('  Peter-Sander-Strasse 39', 0),
+            ('    55252 Mainz-Kastel', 0),
+            (' ', 0),
+            (' USt-ID Nr.: DE 311004438', 0),
+            ('      ', 0),
+            ('     19.04.2022 13:28', 0),
+            ('', 0),
+            ('Red Bull "Blue Edition"', 0),
+            ('1x4,50         4,50 EUR', 0),
+            ('', 0),
+            ('------------------------------', 0),
+            ('', 0),
+            ('Gesamtsumme:         4,50 EUR', 0),
+            ('19% Umsatzsteuer:    0,72 EUR', 0),
+            ('Bezahlt:             4,50 EUR', 0),
+            ('Rückgabe:            0,00 EUR', 0),
+        ] + [('', 0)] * 5
 
-        # exit(0)
+        e.print_text_block(lines=test_lines)
 
         if e.payment(amount_cent=1):
             printer(e.last_printout())
