@@ -16,7 +16,7 @@ from ecrterm.exceptions import (
 from ecrterm.packets.apdu import Packets
 from ecrterm.packets.base_packets import (
     Authorisation, Completion, DisplayText, EndOfDay, Packet, PrintLine,
-    Registration, ResetTerminal, StatusEnquiry, StatusInformation)
+    Registration, ResetTerminal, StatusEnquiry, StatusInformation, PrintTextBlock)
 from ecrterm.packets.bmp import BCD
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
@@ -335,26 +335,28 @@ class ECR(object):
         return self.transmit(DisplayText(**kw))
 
     def print_text(self, lines):
-        """Print text to the printer.
-        lines is an array of line tuples with attributes, e.g.:
-        [
-            ('Hello', 0x10),
-            ('World!', 0x00)
-        ]
-        0x10: Double height
-        0x20: Double width
-        0x30: double width + double height
-        0x40:centred
-        0x50: centred + double height
-        0x60: centred + double width
-        0x70: centred + double width + double height
-        0x0F: justified right (but in this case, all others attributes are disabled)
-        0xFF: linefeed
-        """
-        for line, attribute in lines:
-            res = self.transmit(PrintLine(text=line, attribute=attribute))
-            if TRANSMIT_OK != res:
+        lines_count = 10
+        chunks = [lines[x:x+lines_count] for x in xrange(0, len(lines), lines_count)]
+
+        for chunk in chunks:
+            lines_packet = []
+
+            for line, attribute in chunk:
+                lines_packet.extend(Packet(text_lines=bs2hl(line[:24])).get_data_raw())
+                lines_packet.extend(Packet(attribute=attribute).get_data_raw())
+
+            if chunks[len(chunks) - 1] == chunk:
+                lines_packet.extend(Packet(attribute=0xff).get_data_raw())
+
+            texts_packet = Packet(print_texts=lines_packet).get_data_raw()
+
+            res = self.transmit(
+                PrintTextBlock(tlv=texts_packet)
+            )
+
+            if res != TRANSMIT_OK:
                 return res
+
         return TRANSMIT_OK
 
     def status(self):

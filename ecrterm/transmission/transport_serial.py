@@ -5,6 +5,7 @@ The Serial Layer is a transport used for
 
 @author g4b
 """
+import datetime
 
 import serial
 from ecrterm.common import Transport, noop
@@ -26,9 +27,9 @@ def std_serial_log(instance, data, incoming=False):
         if is_stringlike(incoming):
             data = bs2hl(data)
         if incoming:
-            print('< %s' % toHexString(data))
+            print('{} < {}'.format(datetime.datetime.now().isoformat(), toHexString(data)))
         else:
-            print('> %s' % toHexString(data))
+            print('{} > {}'.format(datetime.datetime.now().isoformat(), toHexString(data)))
     except Exception:
         print('| error in log')
 

@@ -628,6 +628,7 @@ class PrintTextBlock(Packet):
 Packets.register(PrintTextBlock)
 
 
+
 class Diagnosis(Packet):
     """
     06 70

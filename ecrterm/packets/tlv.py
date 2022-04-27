@@ -64,3 +64,6 @@ class TLV(BMP):
             data = data[1:]
         self._data = data[:length]
         return data[length:]
+
+    def dump(self):  # dump the bytes.
+        return [self._id] + TLV.length(len(self._data)) + self._data
