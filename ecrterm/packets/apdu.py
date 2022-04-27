@@ -168,7 +168,7 @@ class APDUPacket(object):
         """Return a description of your fixed data."""
         return self.fixed_values
 
-    def get_data(self):
+    def get_data_raw(self):
         # getting the data of a packet means it is serialized into bytes.
         data = []
         # first, lets get the enriched fixed arguments:
@@ -180,6 +180,10 @@ class APDUPacket(object):
             # if y,
             data += bitmap.dump()
         # last: insert the length
+        return data
+
+    def get_data(self):
+        data = self.get_data_raw()
         return self.data_length(data) + data
 
     def to_list(self):
