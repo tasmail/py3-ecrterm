@@ -5,8 +5,6 @@ from socket import timeout as SocketTimeout
 from struct import unpack
 from sys import platform
 
-from ecrterm.utils import measure
-
 try:
     from urllib.parse import parse_qs, urlsplit
 except:
@@ -110,7 +108,7 @@ class SocketTransport(Transport):
     def send(self, apdu, tries = 0, no_wait = False):
         """Send data."""
         to_send = apdu.to_bytes()
-        #self.slog(data=bs2hl(binstring=to_send), incoming=False)
+        self.slog(data=bs2hl(binstring=to_send), incoming=False)
         total_sent = 0
         msglen = len(to_send)
         while total_sent < msglen:
@@ -133,8 +131,7 @@ class SocketTransport(Transport):
             print('\nwaiting for', length, 'bytes')
         while recv_bytes < length:
             try:
-                f = measure(self.sock.recv)
-                chunk = f(length - recv_bytes)
+                chunk = self.sock.recv(length - recv_bytes)
             except SocketTimeout:
                 raise TransportTimeoutException('Timed out.')
             if self._packetdebug:

@@ -61,7 +61,7 @@ if __name__ == '__main__':
             ('Rückgabe:            0,00 EUR', 0),
         ] + [('', 0)] * 5
 
-        e.print_text_block(lines=test_lines)
+        e.print_text(lines=test_lines)
 
         if e.payment(amount_cent=1):
             printer(e.last_printout())
