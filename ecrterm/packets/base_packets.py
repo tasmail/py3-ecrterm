@@ -6,6 +6,7 @@ from ecrterm.common import ERRORCODES, INTERMEDIATE_STATUS_CODES
 from ecrterm.conv import bs2hl, toHexString
 from ecrterm.packets.apdu import APDUPacket, Packets
 from ecrterm.packets.bmp import BCD, LLLVAR
+from ecrterm.packets.tlv import TLV
 
 
 class Packet(APDUPacket):
@@ -610,59 +611,6 @@ class PrintTextBlock(Packet):
     """
     cmd_class = 0x6
     cmd_instr = 0xd3
-    fixed_arguments = ["lines"]
-
-    def get_len_bytes(self, length):
-        if length >= 0x80:  # 128 or more...
-            # we need more than 1 byte.
-            # lets see if we need only 2:
-            if length > 0xff:  # 256 or more..
-                # 0x82 followed by high byte and low byte.
-                hb = (length & 0xFF00) >> 8
-                lb = length & 0xFF
-                return [0x80 + 2, hb, lb]
-            else:
-                return [0x80 + 1, length]
-        else:
-            # one byte is enough.
-            return [length, ]
-
-    # def get_len_bytes(self, l):
-    #     if not l:
-    #         return []
-    #
-    #     if l < 127:
-    #         return [l]
-    #
-    #     if l < 256:
-    #         return [0b10000001, l]
-    #
-    #     if l < 256 * 256:
-    #         b = [ord(x) for x in struct.pack('<H', l)]
-    #         return [0b10000010] + b
-    #
-    #     raise ValueError("Cannot get length")
-
-    def wrap_tlv(self, blist):
-        return [0x06] + self.get_len_bytes(len(blist)) + blist
-
-    def wrap_print_texts(self, blist):
-        return [0x25] + self.get_len_bytes(len(blist)) + blist
-
-    def wrap_line(self, blist):
-        return [0x07] + self.get_len_bytes(len(blist)) + blist
-
-    def enrich_fixed(self):
-        bs = []
-
-        for line, attr in self.fixed_values.get("lines", []):
-            bs += self.wrap_line(bs2hl(line))
-
-        bs += [0x09, 0x01, 0xFF] # END of text block
-
-        bs = self.wrap_tlv(self.wrap_print_texts(bs))
-
-        return bs
 
     def consume_fixed(self, data, length):
         #global g_beleg

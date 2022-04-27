@@ -357,6 +357,22 @@ class ECR(object):
                 return res
         return TRANSMIT_OK
 
+
+    def print_text_block(self, lines):
+        lines_packet = []
+
+        for line, attribute in lines:
+            lines_packet.extend(Packet(text_lines=bs2hl(line)).get_data()[1:])
+            lines_packet.extend(Packet(attribute=attribute).get_data()[1:])
+
+        lines_packet.extend(Packet(attribute=0xff).get_data()[1:])
+
+        texts_packet = Packet(print_texts=lines_packet).get_data()[1:]
+
+        return self.transmit(
+            PrintTextBlock(tlv=texts_packet)
+        )
+
     def status(self):
         """
         executes a status enquiry. also sets self.version if not set.

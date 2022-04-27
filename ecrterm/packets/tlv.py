@@ -17,6 +17,7 @@ TLV Container Format.
         # b8 if 1, this byte only codes how many follow.
 """
 from ecrterm.packets.bmp import BMP
+from ecrterm.utils import is_stringlike
 
 
 class TLV(BMP):
@@ -64,3 +65,6 @@ class TLV(BMP):
             data = data[1:]
         self._data = data[:length]
         return data[length:]
+
+    def dump(self):  # dump the bytes.
+        return [self._id] + TLV.length(len(self._data)) + self._data
