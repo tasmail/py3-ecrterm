@@ -113,6 +113,8 @@ BITMAPS = {
         BMP.FormatByte(1), 'ok_required',
         "binary confirmation the input with <OK> required"),
     0xFC: (BMP.FormatByte(1), 'dialog_control', "binary dialog-control"),
+    0x6f: (BMP.FormatByte(1), "???", "???"),  # FIXME: New for Lane/5000
+    0x78: (BMP.FormatByte(1), "???", "???"),  # FIXME: New for Lane/5000
 }
 
 BITMAPS_ARGS = {}
