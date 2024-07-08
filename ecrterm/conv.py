@@ -109,7 +109,10 @@ def ascii_bytes_to_bytes(ascii_bytes):
 
 def is_ascii_alnum(s):
     try:
-        return unicode.isalnum(s.decode('ascii'))
+        if sys.version_info.major == 2:
+            return unicode.isalnum(s.decode('ascii'))
+        elif sys.version_info.major == 3:
+            return s.decode('ascii').isalnum()
     except UnicodeDecodeError:
         return False
 
