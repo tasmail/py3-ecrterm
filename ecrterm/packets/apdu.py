@@ -1,5 +1,5 @@
 """Classes and Functions which deal with the APDU Layer."""
-
+import struct
 from logging import debug
 
 from six.moves import range
@@ -190,7 +190,7 @@ class APDUPacket(object):
         return [self.cmd_class, self.cmd_instr or 0] + self.data
 
     def to_bytes(self):
-        return ''.join(list(map(chr, self.to_list())))
+        return struct.pack('BB{}B'.format(len(self.data)), self.cmd_class, self.cmd_instr, *self.data)
 
     #############################################
     # Parsing ###################################

@@ -136,7 +136,7 @@ class Registration(Packet):
                 [toHexString([c]) for c in data[0:3]])
             self.fixed_values['config_byte'] = data[3]
         if length >= 6:
-            self.fixed_values['cc'] = data[4:6]
+            self.fixed_values['cc'] = data[3:5]
         # rest is bitmaps
         if length > 6:
             return data[6:]
