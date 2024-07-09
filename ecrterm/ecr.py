@@ -6,6 +6,7 @@ Maybe create a small console program which allows us to:
 - see the representation of the packet
 - ability for incoming and outgoing
 """
+import sys
 from logging import error
 from time import sleep
 
@@ -336,7 +337,10 @@ class ECR(object):
 
     def print_text(self, lines):
         lines_count = 10
-        chunks = [lines[x:x+lines_count] for x in xrange(0, len(lines), lines_count)]
+        if sys.version_info.major == 2:
+            chunks = [lines[x:x+lines_count] for x in xrange(0, len(lines), lines_count)]
+        else:
+            chunks = [lines[x:x + lines_count] for x in range(0, len(lines), lines_count)]
 
         for chunk in chunks:
             lines_packet = []
