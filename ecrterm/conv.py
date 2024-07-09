@@ -112,7 +112,9 @@ def is_ascii_alnum(s):
         if sys.version_info.major == 2:
             return unicode.isalnum(s.decode('ascii'))
         elif sys.version_info.major == 3:
-            return s.decode('ascii').isalnum()
+            if isinstance(s, str):
+                s = s.encode().decode('ascii')
+            return s.isalnum()
     except UnicodeDecodeError:
         return False
 
@@ -127,6 +129,8 @@ def toBytes(bytestring):
     if is_ascii_alnum(bytestring):
         return ascii_bytes_to_bytes(bytestring)
     else:
+        if sys.version_info.major == 3 and isinstance(bytestring, bytes):
+            return list(bytestring)
         return list(map(ord, bytestring))
 
 
