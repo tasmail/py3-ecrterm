@@ -1,3 +1,4 @@
+import sys
 from binascii import hexlify
 from socket import (
     IPPROTO_TCP, SHUT_RDWR, SO_KEEPALIVE, SOL_SOCKET, create_connection)
@@ -148,7 +149,10 @@ class SocketTransport(Transport):
         length, and return the packed and the `int` converted length.
         """
         data = self._receive_bytes(length=3)
-        length = ord(data[2])
+        if sys.version_info.major == 2:
+            length = ord(data[2])
+        else:
+            length = data[2]
         if length != 0xff:
             return data, length
         # Need to get 2 more bytes
