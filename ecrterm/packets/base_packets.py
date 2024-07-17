@@ -608,21 +608,34 @@ class PrintTextBlock(Packet):
     """
     cmd_class = 0x6
     cmd_instr = 0xd3
+    fixed_arguments = ['attribute', 'text']
+    fixed_values = {}
 
     def consume_fixed(self, data, length):
         #global g_beleg
         """We just print the data for now."""
-        # print (type(data))  ist eine liste
-        #print(data)
-        print('--------PrintTextBlock-------------------')
-        beleg = ''
-        #for b in data:
-        for n in range(12, len(data)-3):
-            beleg= beleg+( chr(data[n]))
-        print(beleg)
-        #g_beleg = beleg
-        print('--------PrintTextBlock-----EOF-----------')
-        return data
+        if length:
+            # print (type(data))  ist eine liste
+            #print(data)
+            print('--------PrintTextBlock-------------------')
+            beleg = ''
+            #for b in data:
+            for n in range(12, len(data)-3):
+                beleg= beleg+(chr(data[n]))
+            print(beleg)
+            #g_beleg = beleg
+            print('--------PrintTextBlock-----EOF-----------')
+            self.fixed_values['attribute'] = int(data[0])  # attribute 1 byte
+            self.fixed_values['text'] = beleg
+            return []
+
+        return []
+
+    def enrich_fixed(self):
+        # take attribute first
+        bs = [self.fixed_values.get('attribute', 0)]
+        bs += bs2hl(self.fixed_values.get('text', ''))
+        return bs
 
 
 Packets.register(PrintTextBlock)

@@ -266,7 +266,7 @@ class ECR(object):
         printout = []
         for entry in self.transmitter.last_history:
             inc, packet = entry
-            if inc and isinstance(packet, PrintLine):
+            if inc and (isinstance(packet, PrintLine) or isinstance(packet, PrintTextBlock)):
                 printout += [packet.fixed_values['text']]
         return printout
 
