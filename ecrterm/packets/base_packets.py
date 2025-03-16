@@ -4,6 +4,7 @@ from ecrterm.common import ERRORCODES, INTERMEDIATE_STATUS_CODES
 from ecrterm.conv import bs2hl, toHexString
 from ecrterm.packets.apdu import APDUPacket, Packets
 from ecrterm.packets.bmp import BCD, LLLVAR
+from ecrterm.packets.tlv_parser import TlvParser
 
 
 class Packet(APDUPacket):
@@ -612,21 +613,19 @@ class PrintTextBlock(Packet):
     fixed_values = {}
 
     def consume_fixed(self, data, length):
-        #global g_beleg
         """We just print the data for now."""
         if length:
-            # print (type(data))  ist eine liste
-            #print(data)
-            print('--------PrintTextBlock-------------------')
-            beleg = ''
-            #for b in data:
+            # print('--------PrintTextBlock-------------------')
+            receipt = ''
+
             for n in range(12, len(data)-3):
-                beleg= beleg+(chr(data[n]))
-            print(beleg)
-            #g_beleg = beleg
-            print('--------PrintTextBlock-----EOF-----------')
+                receipt = receipt + (chr(data[n]))
+            # print(receipt)
+            # print('--------PrintTextBlock-----EOF-----------')
+
             self.fixed_values['attribute'] = int(data[0])  # attribute 1 byte
-            self.fixed_values['text'] = beleg
+            self.fixed_values['text'] = receipt
+            self.fixed_values['text_blocks'] = TlvParser.parse(data)
             return []
 
         return []
