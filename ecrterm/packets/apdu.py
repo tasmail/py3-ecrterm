@@ -216,6 +216,7 @@ class APDUPacket(object):
         # note: data does NOT containt cmd_class, cmd_instr anymore!
         # however, it DOES contain the LENGTH
         # now we introspect data
+
         pos = 0
         bitmaps = []
         if blob[pos] == 0xff:

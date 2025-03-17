@@ -23,13 +23,13 @@ class TlvParser:
     def calculate_tlv_tag(data, offset):
         if len(data) < offset + 1:
             logging.warning(f'TlvParser: expected len: {offset + 1} but {len(data)}!')
-            return 0x0
+            return 0x0, offset
 
         byte_value = data[offset]
         offset += 1
         is_tag_num_in_next_byte = TlvParser.are_all_bits_set(byte_value, [0, 1, 2, 3, 4])
         if not is_tag_num_in_next_byte:
-            return byte_value
+            return byte_value, offset
 
         tag_value = byte_value
 
@@ -37,12 +37,13 @@ class TlvParser:
         while is_tag_num_in_next_byte:
             tag_value = (tag_value << 8)
             byte_value = data[offset]
+            tag_value += byte_value
             offset += 1
             is_tag_num_in_next_byte = TlvParser.is_bit_set(byte_value, 7)
             i += 1
             if i > 7:
                 logging.warning(f'TlvParser: tag_value is too big!')
-                return tag_value
+                return tag_value, offset
 
         return tag_value, offset
 
@@ -105,7 +106,7 @@ class TlvParser:
 
         while offset < data_len:
             tag, offset = TlvParser.calculate_tlv_tag(data, offset)
-            length = TlvParser.calculate_tlv_length(data, offset)
+            length, offset  = TlvParser.calculate_tlv_length(data, offset)
 
             tlv_data = data[offset:offset+length]
             offset += length

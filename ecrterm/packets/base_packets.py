@@ -586,7 +586,11 @@ class PrintLine(Packet):
     def consume_fixed(self, data, length):
         if length:
             self.fixed_values['attribute'] = int(data[0])  # attribute 1 byte
-            self.fixed_values['text'] = ''.join([chr(i) for i in data[1:]])
+            try:
+                line = bytearray(data[1:]).decode('cp437')
+            except:
+                line =  ''.join([chr(i) for i in data[1:]])
+            self.fixed_values['text'] = line
             return []
         return []
 
@@ -601,7 +605,6 @@ Packets.register(PrintLine)
 
 
 class PrintTextBlock(Packet):
-    #global g_beleg
     """
     06 D3
     Same as Printline but for a textblock.
@@ -609,23 +612,45 @@ class PrintTextBlock(Packet):
     """
     cmd_class = 0x6
     cmd_instr = 0xd3
-    fixed_arguments = ['attribute', 'text']
+    fixed_arguments = ['attribute', 'text', 'receipt_type', 'lines']
     fixed_values = {}
 
     def consume_fixed(self, data, length):
         """We just print the data for now."""
         if length:
-            # print('--------PrintTextBlock-------------------')
+            res = TlvParser.parse(data)
             receipt = ''
+            lines = []
+            receipt_type = 0
 
-            for n in range(12, len(data)-3):
-                receipt = receipt + (chr(data[n]))
-            # print(receipt)
-            # print('--------PrintTextBlock-----EOF-----------')
+            if  len(res) and res[0].get('tag') == 0x06: # RestrictionCode1
+                res = TlvParser.parse(res[0].get('data'))
+                if len(res) > 0 and res[0].get('tag') == 0x1F07:  # ReceiptType
+                    r_data = res[0].get('data')
+                    if r_data:
+                        receipt_type = r_data[0]
+
+                if len(res) > 1 and res[1].get('tag') == 0x25: # PrintTexts
+                    res = TlvParser.parse(res[1].get('data'))
+                    for item in res:
+                        if item.get('tag') == 0x07: # TextLines
+                            line_data = item.get('data')
+                            if not line_data:
+                                receipt += '\n'
+                                lines.append('')
+                                continue
+                            try:
+                                line = bytearray(line_data).decode('cp437')
+                            except:
+                                continue
+                            lines.append(line)
+                            receipt += line
+                            receipt += '\n'
 
             self.fixed_values['attribute'] = int(data[0])  # attribute 1 byte
             self.fixed_values['text'] = receipt
-            self.fixed_values['text_blocks'] = TlvParser.parse(data)
+            self.fixed_values['lines'] = lines
+            self.fixed_values['receipt_type'] = receipt_type
             return []
 
         return []
