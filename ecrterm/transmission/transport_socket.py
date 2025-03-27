@@ -175,6 +175,8 @@ class SocketTransport(Transport):
         """
         Receive data, return success status and ADPUPacket instance.
         """
+        if timeout is None:
+            timeout = self.connect_timeout
         self.sock.settimeout(timeout)
         data = self._receive()
         self.slog(data=bs2hl(binstring=data), incoming=True)
