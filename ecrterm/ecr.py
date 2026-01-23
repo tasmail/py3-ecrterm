@@ -297,6 +297,14 @@ class ECR(object):
             print('transmit error?')
         return False
 
+    def abort_command(self):
+        """
+        raises Flag in the transmission loop.
+        Abort will be sent only if we sent Autorization Packet and last
+        received Packet from ECR is IntermediateStatusInformation "Insert Card"
+        """
+        self.transmitter.request_abort_command()
+
     def restart(self):
         """Restarts/resets the PT."""
         self._state_registered = False

@@ -502,6 +502,10 @@ class IntermediateStatusInformation(Packet):
                 data = data[1:]  # can be tlv.
         return data
 
+    def is_insert_card_status(self):
+        value = self.fixed_values.get('intermediate_status', None)
+        return value == 0x0A # insert card
+
     def __repr__(self):
         return 'IntermediateStatus{04 FF}: %s' % (
             INTERMEDIATE_STATUS_CODES.get(
