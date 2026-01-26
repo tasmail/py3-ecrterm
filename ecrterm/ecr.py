@@ -17,7 +17,7 @@ from ecrterm.exceptions import (
 from ecrterm.packets.apdu import Packets
 from ecrterm.packets.base_packets import (
     Authorisation, Completion, DisplayText, EndOfDay, Packet, PrintLine,
-    Registration, ResetTerminal, StatusEnquiry, StatusInformation, PrintTextBlock)
+    Registration, ResetTerminal, StatusEnquiry, StatusInformation, PrintTextBlock, ActivateServiceMode)
 from ecrterm.packets.bmp import BCD
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
@@ -256,6 +256,17 @@ class ECR(object):
                 traceback.print_exc()
                 error('Error in Daylog Template')
         return result
+
+    def activate_service_mode(self, listener=None):
+        """
+        With this command the ECR switch the PT into Service-Mode.
+        In Service-Mode the PT displays the configuration-menu.
+        """
+        packet = ActivateServiceMode(self.password)
+        if listener:
+            packet.register_response_listener(listener)
+
+        result = self.transmit(packet=packet)
 
     def last_printout(self):
         """

@@ -763,6 +763,23 @@ class StatusEnquiry(Packet):
 
 Packets.register(StatusEnquiry)
 
+
+class ActivateServiceMode(Packet):
+    """Activate service mode of the card terminal"""
+    cmd_class = 0x08
+    cmd_instr = 0x01
+    fixed_arguments = ('password',)
+    fixed_values = {'password': '123456'}
+    wait_for_completion = True
+
+    def consume_fixed(self, data, length):
+        if length:
+            self.fixed_values['password'] = ''.join(
+                [toHexString([c]) for c in data[0:3]])
+        return data[3:]
+
+Packets.register(ActivateServiceMode)
+
 if __name__ == '__main__':
     # test the register
     from pprint import pprint
