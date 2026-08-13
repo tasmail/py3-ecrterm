@@ -1,0 +1,22 @@
+# Normalize text files to LF in the repository and working tree
+* text=auto eol=lf
+
+# Files that must remain binary
+*.7z binary
+*.bmp binary
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.mp4 binary
+*.pdf binary
+*.png binary
+*.svg binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.zip binary
+
+# Windows scripts, if used
+*.bat text eol=crlf
+*.cmd text eol=crlf
