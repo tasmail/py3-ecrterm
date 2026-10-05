@@ -17,7 +17,7 @@ from unittest import TestCase, main
 
 from ecrterm.conv import toHexString
 from ecrterm.packets.base_packets import (
-    Authorisation, Diagnosis, DisplayText, Initialisation, PacketReceived,
+    Authorisation, Diagnosis, DisplayText, Initialisation, Packet, PacketReceived,
     PacketReceivedError, PrintLine, Registration, ResetTerminal, StatusEnquiry)
 from ecrterm.transmission.signals import ACK, NAK
 from ecrterm.transmission.transport_serial import SerialMessage
@@ -65,6 +65,20 @@ class TestCaseDataEncoding(TestCase):
         data_expected = '10 02 06 70 00 10 03 D9 F9'
         pk = Diagnosis()
         self.assertEqual(data_expected, list_of_bytes(pk))
+
+    def test_packet_diagnosis_with_type(self):
+        # Diagnosis with TLV container holding tag 1B (diagnosis type)
+        data_expected = '06 70 05 06 03 1B 01 02'
+        pk = Diagnosis(diagnosis_type=Diagnosis.TYPE_EXTENDED)
+        self.assertEqual(data_expected, toHexString(pk.to_list()))
+
+    def test_packet_diagnosis_type_parsed(self):
+        pk = Packet.parse([0x06, 0x70, 0x05, 0x06, 0x03, 0x1B, 0x01, 0x03])
+        self.assertIsInstance(pk, Diagnosis)
+        self.assertEqual(Diagnosis.TYPE_CONFIGURATION, pk.diagnosis_type)
+
+    def test_packet_diagnosis_without_type(self):
+        self.assertIsNone(Diagnosis().diagnosis_type)
 
     def test_packet_printline(self):
         # Print Line Packet

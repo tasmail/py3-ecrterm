@@ -673,10 +673,35 @@ Packets.register(PrintTextBlock)
 class Diagnosis(Packet):
     """
     06 70
+    optional: TLV container (BMP 06) with tag 1B = diagnosis type.
+    without a diagnosis type the PT performs a line diagnosis.
     """
     cmd_class = 0x6
     cmd_instr = 0x70
     wait_for_completion = True
+
+    TAG_DIAGNOSIS_TYPE = 0x1B
+    TYPE_LINE = 0x01
+    TYPE_EXTENDED = 0x02
+    TYPE_CONFIGURATION = 0x03
+    TYPE_EMV_CONFIGURATION = 0x04
+    TYPE_EP2_CONFIGURATION = 0x05
+
+    def __init__(self, *args, **kwargs):
+        diagnosis_type = kwargs.pop('diagnosis_type', None)
+        if diagnosis_type is not None:
+            kwargs['tlv'] = [self.TAG_DIAGNOSIS_TYPE, 0x01, diagnosis_type]
+        super(Diagnosis, self).__init__(*args, **kwargs)
+
+    @property
+    def diagnosis_type(self):
+        for bmp in self.bitmaps:
+            if bmp.id != 0x06:
+                continue
+            for tlv in TlvParser.parse(bmp._data):
+                if tlv['tag'] == self.TAG_DIAGNOSIS_TYPE and tlv['data']:
+                    return tlv['data'][0]
+        return None
 
     def _handle_response(self, response, tm):
         if isinstance(response, PrintLine):

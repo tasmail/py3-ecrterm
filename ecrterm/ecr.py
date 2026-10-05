@@ -16,7 +16,7 @@ from ecrterm.exceptions import (
     TransportConnectionFailed, TransportLayerException)
 from ecrterm.packets.apdu import Packets
 from ecrterm.packets.base_packets import (
-    Authorisation, Completion, DisplayText, EndOfDay, Packet, PrintLine,
+    Authorisation, Completion, Diagnosis, DisplayText, EndOfDay, Packet, PrintLine,
     Registration, ResetTerminal, StatusEnquiry, StatusInformation, PrintTextBlock, ActivateServiceMode)
 from ecrterm.packets.bmp import BCD
 from ecrterm.transmission._transmission import Transmission
@@ -267,6 +267,20 @@ class ECR(object):
             packet.register_response_listener(listener)
 
         result = self.transmit(packet=packet)
+
+    def diagnosis(self, diagnosis_type=None, listener=None):
+        """
+        sends a diagnosis packet (06 70).
+
+        @param diagnosis_type: one of Diagnosis.TYPE_* (sent as tag 1B),
+        None lets the PT perform a line diagnosis.
+        @returns: 0 if there were no protocol errors.
+        the receipt can be read with `last_printout()` afterwards.
+        """
+        packet = Diagnosis(diagnosis_type=diagnosis_type)
+        if listener:
+            packet.register_response_listener(listener)
+        return self.transmit(packet=packet)
 
     def last_printout(self):
         """
