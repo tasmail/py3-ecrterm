@@ -21,6 +21,7 @@ from ecrterm.packets.base_packets import (
 from ecrterm.packets.bmp import BCD
 from ecrterm.transmission._transmission import Transmission
 from ecrterm.transmission.signals import ACK, DLE, ETX, NAK, STX, TRANSMIT_OK
+from ecrterm.transmission.transport_simulator import SimulatorTransport
 from ecrterm.transmission.transport_serial import SerialTransport
 from ecrterm.transmission.transport_socket import SocketTransport
 from ecrterm.utils import detect_pt_serial, is_stringlike
@@ -150,6 +151,12 @@ class ECR(object):
             self.transport = SerialTransport(device)
         elif device.startswith('socket://'):
             self.transport = SocketTransport(uri=device)
+        elif device.startswith('simulator://'):
+            self.transport = SimulatorTransport(uri=device)
+        else:
+            raise ValueError(
+                'Unknown device %r, expected a serial port, socket:// '
+                'or simulator:// URI.' % device)
         # This turns on debug logging
         # self.transport.slog = ecr_log
         self.daylog = []
